@@ -70,6 +70,8 @@ Ademas:
 ### Paso 1:Crear un contenedor para MySQL, definiendo las credenciales necesarias.
 Luego crear una red personalizada llamada mired para permitir la comunicación entre los contenedores: 
 
+<img src="00.jpg" alt="Paso1" width="800">
+
 - docker network create mired
 <img src="001.jpg" alt="Paso1" width="800">
 
@@ -84,10 +86,6 @@ Tomemos en cuenta que:
 
 <img src="0001.jpg" alt="Paso1" width="800">
 
-Revisamos que este creado el contenedor:
-
-<img src="00001.jpg" alt="Paso1" width="800">
-
 ### Paso 2: Crear un contenedor para phpMyAdmin, configurando las credenciales.
 
 Crear el contenedor para phpMyAdmin: 
@@ -97,7 +95,6 @@ Tomemos en cuenta que:
 - --network mired: lo conecta a la red mired.
 - -e PMA_HOST=mysql_server: dice que el servidor de base de datos es el contenedor mysql_server.
 - -p 8080:80: hace que phpMyAdmin esté accesible en el navegador entrando a localhost:8080.
-- -d phpmyadmin/phpmyadmin: usa la imagen oficial de phpMyAdmin.
 
 <img src="2.jpg" alt="Paso2" width="800">
 
