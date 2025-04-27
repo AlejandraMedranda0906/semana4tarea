@@ -1,175 +1,151 @@
-# Creacion volúmenes para persistir base de datos
+# TENDENCIAS TECNOLOGICAS
 
 ## 1. Titulo
-TAS3 - Volúmenes para persistir base de datos
+TAS4 - Red de contenedores mysql y phpmyadmin
 ## 2. Tiempo de duración
-El tiempo de duración fue de 4 horas aproximadamente para el desarrollo de la práctica.
+El tiempo de duración fue de 5 horas aproximadamente para el desarrollo de la práctica.
 
 ## 3. Fundamentos:
 
-En esta...... práctica es primordial comprender estos conceptos: Docker, PostgreSQL y volúmenes.
-Docker es una plataforma que permite crear contenedores donde se puede ejecutar software de forma reproducible. En cada contenedor se incluye todo lo necesario para que la aplicación funcione como un sistema de archivos,o bibliotecas, configuraciones, etc. Sin embargo, cuando un contenedor se elimina, los datos almacenados dentro de él también desaparecen, a menos que se utilicen mecanismos de persistencia como los volúmenes.
+En esta práctica se trabajó con contenedores Docker, comprendiendo conceptos fundamentales de redes como:
 
-PostgreSQL es un sistema de gestión de bases de datos relacional (RDBMS), utilizado por su robustez, escalabilidad y compatibilidad con estándares SQL. En esta práctica, se usó PostgreSQL dentro de un contenedor Docker para demostrar cómo se comportan los datos cuando se usa o no un volumen.
+Dirección IP: Identificador único para la comunicación entre dispositivos o contenedores en una red.
+Puerto: Punto de acceso para diferenciar múltiples servicios en un mismo contenedor o máquina.
+Red personalizada en Docker: Permite la comunicación controlada y segura entre contenedores.
 
-Los volúmenes en Docker permiten almacenar datos fuera del ciclo de vida del contenedor, esto quiere decir que aunque se detenga o se elimine el contenedor, los datos guardados en el volumen se conservan. Esto nos garantiza que la información no se pierda entre reinicios o actualizaciones de contenedores.
+MySQL es un sistema de gestión de bases de datos relacional (RDBMS), ampliamente utilizado para almacenar y administrar información estructurada. En esta práctica, se utiliza MySQL dentro de un contenedor Docker para gestionar bases de datos de prueba.
+
+phpMyAdmin es una herramienta basada en web que permite la administración de bases de datos MySQL a través de una interfaz gráfica amigable, facilitando la creación, modificación y eliminación de bases de datos y registros.
 
 Esta práctica tiene dos enfoques:
-- Sin volumen: se creó un contenedor PostgreSQL, se ingresan datos y luego se eliminan. Al volver a crearlos, los datos se pierden.
+- Crear una red personalizada en Docker para permitir la comunicación entre contenedores.
 
-- Con volumen: se crea otro contenedor PostgreSQL con un volumen asociado. Se eliminará y al volver a crear el contenedor, los datos deben seguir disponibles.
+- Implementar y conectar dos servicios (MySQL y phpMyAdmin) utilizando dicha red
 
-A su vez, se utilizó TabletPlus como administrador visual para conectarse a la base de datos PostgreSQL, facilitando la creación de tablas y el manejo de registros sin necesidad de usar directamente la terminal.
+Además, se utilizó MySQL que es un sistema de gestión de bases de datos relacional y phpMyAdmin que es una herramienta web para administrar bases de datos MySQL de forma gráfica.
 
+El objetivo es crear una red personalizada en Docker para interconectar dos contenedores: uno ejecutando MySQL y otro phpMyAdmin.
 
 ## 4. Conocimientos previos.
 
 Para realizar esta practica el estudiante necesita tener claro los siguientes temas:
 - Uso de la terminal o línea de comandos
 - Manejo de navegador
-- Uso de Docker
-- Fundamentos de bases de datos relacionales
-- TablePlus o DataGrip
+- Uso básico de Docker
+- Conceptos de redes en Docker
+- Manejo básico de bases de datos MySQL
+- Uso de phpMyAdmin
+Ademas:
+- Comandos para crear redes.
+- Unir contendores a una red
+- Configurar aplicaciones
 
 ## 5. Objetivos a alcanzar
 
-- Comprender la necesidad de persistencia en aplicaciones basadas en contenedores.
-- Crear y gestionar volúmenes persistentes usando comandos de Docker.
-- Identificar la diferencia entre ejecutar un contenedor con o sin volumen.
-
+- Implementar redes de contenedores en Docker para permitir la       comunicación entre aplicaciones contenerizadas.
+- Comprender los diferentes tipos de redes disponibles.
+- Crear dos contenedores, uno para MySQL y otro para phpMyAdmin, establecer una red personalizada en Docker que permita la comunicación entre ambos, 
+- Crear una base de datos de prueba usando la interfaz de phpMyAdmin.
 
 ## 6. Equipo necesario:
 
 - Computador con sistema operativo Windows/Linux/Mac 
 - Cuenta en docker play
 - Docker y terminal
-- TablePlus instalado
+- Uso de phpMyAdmin
 
 
 ## 7. Material de apoyo.
 
 - Documentacion oficial de docker.
+- Documentación oficial de MySQL.
+- Documentación oficial de phpMyAdmin.
 - Guia de la asignatura.
-- Cheat sheet de comandos linux
-- Documentación de TablePlus
+
 
 ## 8. Procedimiento
 
-## Parte 1: Base de datos sin volumen
+## Parte 1: Crear dos contenedores: uno para MySQL y otro para phpMyAdmin, y establecer una red que permita la comunicación entre ambos.
 
-### Paso 1:Crear un contenedor PostgreSQL con el nombre server_db1.
-Dentro de la terminal con el contenedor se ejecuta este comando: docker run --name server_db1 -e POSTGRES_PASSWORD=1234 -p 5432:5432 -d postgres. De esta manera se crea y se ejecuta un contenedor PostgreSQL con su puerto.
+### Paso 1:Crear un contenedor para MySQL, definiendo las credenciales necesarias.
+Luego crear una red personalizada llamada mired para permitir la comunicación entre los contenedores: 
 
-<img src="1.jpg" alt="Paso1" width="800">
+- docker network create mired
+<img src="001.jpg" alt="Paso1" width="800">
 
-### Paso 2: Conectar un administrador de base de datos (como DataGrip o TablePlus) al contenedor server_db1.
-Se conecto con un administrador de base de datos, en este caso se utilizo TablePlus para poder conectar con server_db1. Se uso localhost como host, puerto 5432, usuario postgres, y contraseña 1234.
+Crear el contenedor de MySQL, especificando la contraseña del usuario root y una base de datos de prueba: docker run --name mysql_server --network mired -e MYSQL_ROOT_PASSWORD=1234 -e MYSQL_DATABASE=prueba_db -p 3306:3306 -d mysql:latest
+Tomemos en cuenta que:
+- --name mysql_server: le pone de nombre mysql_server al contenedor.
+- --network mired: conecta este contenedor a la red que se creo.
+- -e MYSQL_ROOT_PASSWORD=1234: establece que la contraseña de root será 1234.
+- -e MYSQL_DATABASE=prueba_db: crea una base de datos llamada prueba_db.
+- -p 3306:3306: expone el puerto de MySQL para que se pueda usarlo.
+- -d mysql:latest: usa la última versión de MySQL.
+
+<img src="0001.jpg" alt="Paso1" width="800">
+
+Revisamos que este creado el contenedor:
+
+<img src="00001.jpg" alt="Paso1" width="800">
+
+### Paso 2: Crear un contenedor para phpMyAdmin, configurando las credenciales.
+
+Crear el contenedor para phpMyAdmin: 
+docker run --name phpmyadmin_server --network mired -e PMA_HOST=mysql_server -p 8080:80 -d phpmyadmin/phpmyadmin
+Tomemos en cuenta que:
+- --name phpmyadmin_server: nombra al contenedor phpmyadmin_server.
+- --network mired: lo conecta a la red mired.
+- -e PMA_HOST=mysql_server: dice que el servidor de base de datos es el contenedor mysql_server.
+- -p 8080:80: hace que phpMyAdmin esté accesible en el navegador entrando a localhost:8080.
+- -d phpmyadmin/phpmyadmin: usa la imagen oficial de phpMyAdmin.
 
 <img src="2.jpg" alt="Paso2" width="800">
 
-### Paso 3: Crear una base de datos llamada test.
-Se crea una base de datos llamado test.
+### Paso 3: Crear una red personalizada en Docker que permita la comunicación entre ambos contenedores.
+
+Crear el contenedor de phpMyAdmin y conectarlo a la misma red, indicando el servidor de MySQL: docker run --name phpmyadmin_server --network mired -e PMA_HOST=mysql_server -p 8080:80 -d phpmyadmin/phpmyadmin
+Tomemos en cuenta que:
+- PMA_HOST=mysql_server establece el contenedor de MySQL como host.
+- -p 8080:80 expone phpMyAdmin en el puerto 8080 de la máquina local.
+
 <img src="3.jpg" alt="Paso3" width="800">
 
+### Paso 4: Conectar ambos contenedores a la red creada.
 
-### Paso 4: En la base de datos test, crear una tabla llamada customer con los campos: id, fullname y status.
-Se crea la tabla customer dentro de test. Se utilizo id, fullname y status.
+Al crear los contenedores usando el parámetro --network mired, ambos ya están conectados automáticamente a la misma red. Esto permite visualizar los detalles de la red mired.
+
 <img src="4.jpg" alt="Paso4" width="800">
 
-### Paso 5: Insertar al menos un registro en la tabla customer
-Insertar dos registro en la tabla.
+### Paso 5: Configurar la conexión entre phpMyAdmin y MySQL, y crear una base de datos de prueba desde la interfaz de phpMyAdmin.
+
+Abrir un navegador web y acceder a http://localhost:8080.
+En la pantalla de inicio de phpMyAdmin, conectarse usando:
+- Servidor: mysql_server
+- Usuario: root
+- Contraseña: 1234
+Una vez dentro de phpMyAdmin, verificar que prueba_db se haya creado correctamente.
+Crear una tabla de prueba para confirmar que la conexión entre phpMyAdmin y MySQL funciona correctamente.
 
 <img src="5.jpg" alt="Paso5" width="800">
 
-### Paso 6: Detener y eliminar el contenedor server_db1.
-- El primer comando->  docker stop server_db1  ->detiene el contenedor.
-- El segundo comando->  docker rm server_db1 ->elimina el contenedor detenido.
-
-<img src="6.jpg" alt="Paso6" width="800">
-
-Verifico las veces necesarias hasta que el contenedor si a sido eliminado, con este comando: docker ps -a  y para isnpeccionar con: docker volumen ls 
-
-<img src="06.jpg" alt="Paso6" width="800">
-
-<img src="006.jpg" alt="Paso6" width="800">
-
-### Paso 7: Volver a crear el contenedor PostgreSQL con el mismo nombre server_db1.
-Se vuelve a crear el contenedor con el mismo nombre server_db1: docker run --name server_db1 -e POSTGRES_PASSWORD=1234 -p 5432:5432 -d postgres
-Verifico que el contenedor este corriendo con este comando: docker ps
-
-<img src="7.jpg" alt="Paso7" width="800">
-
-### Paso 8: Conectarse nuevamente desde el administrador de base de datos.
-Se volvio a conectarse nuevamente desde TablePlus.
-
-<img src="8.jpg" alt="Paso8" width="800">
-
-### Paso 9: Verificar que la base de datos test ya no existe, demostrando que los datos no se han conservado.
-Se verifico la base de datos de test ya no exista.
-
-<img src="9.jpg" alt="Paso9" width="800">
-
-
-## Parte 2: Base de datos con volumen
-
-### Paso 1:Crear un volumen en Docker con el comando:
-Crear un volumen en Docker:docker volume create pgdata
-<img src="imagen 1.jpg" alt="Paso1" width="800">
-
-### Paso 2: Crear un contenedor PostgreSQL con el nombre server_db2, asociando el volumen creado:
-Se crea un contenedro PostgreSQL con volumen: docker run --Ale server_db2 -e POSTGRES_PASSWORD=1234 -p 5433:5432 -v pgdata:/var/lib/postgresql/data -d postgres
-
-<img src="imagen 2.jpg" alt="Paso2" width="800">
-
-Verifico que el contenedor esté corriendo
-
-<img src="imagen02.jpg" alt="Paso2" width="800">
-
-### Paso 3: Conectarse al contenedor con DataGrip o TablePlus.
-Se conecto desde TablePlus a server_db2, usando:  localhost, puerto 5433, usuario postgres, contraseña 1234.
-<img src="imagen 3.jpg" alt="Paso3" width="800">
-
-### Paso 4: Crear la base de datos test.
-Se crea la base de datos test.
-<img src="imagen 4.jpg" alt="Paso4" width="800">
-
-### Paso 5: Crear la tabla customer con los campos: id, fullname, status.
-Se crea la base de datos customer con sus respectivos campos.
-<img src="imagen 5.png" alt="Paso5" width="800">
-
-### Paso 6: Insertar al menos un registro en la tabla.
-Se inserto dos registros.
-<img src="imagen 6.png" alt="Paso6" width="800">
-
-### Paso 7: Detener y eliminar el contenedor server_db2.
-.......
-
-<img src="imagen 7.png" alt="Paso7" width="800">
-
-### Paso 8: Volver a crear el contenedor server_db2 usando el volumen pgdata nuevamente.
-Volver a crear el contenedor usando el volumen pgdata
-<img src="imagen 8.png" alt="Paso8" width="800">
-
-### Paso 9: Conectarse desde el administrador de base de datos y verificar que la base de datos test y los registros han persistido.
-Se conecta desde TablePlus y verificar que los datos sigan.
-<img src="imagen 9.png" alt="Paso9" width="800">
-
 ## 9. Resultados esperados:
 
-- Los resultados obtenidos es que sin volumen, la base de datos y sus registros se pierden al eliminar el contenedor.
-- Con volumen, los datos permanecen incluso al eliminar y volver a crear el contenedor.
-- Se visualiza correctamente la información desde TablePlus.
-- Se refuerzan los conocimientos sobre persistencia de datos en contenedores Docker.
+- Contenedores conectados correctamente mediante la red personalizada mired.
+- Acceso exitoso a MySQL mediante phpMyAdmin usando la IP de red interna.
+- Creación de bases de datos y tablas usando phpMyAdmin.
+- Se fortalecen los conocimientos en creación de redes, administración de contenedores y gestión básica de bases de datos.
 
 ## 10. Bibliografía
 
 - Docker Inc. (2024). Docker Documentation. Recuperado de: https://docs.docker.com
 
-- TablePlus. (2024). Documentación oficial. TablePlus. https://tableplus.com
+- MySQL Documentation Team. (2024). MySQL 8.0 Reference Manual. Recuperado de: https://dev.mysql.com/doc/
 
-- PostgreSQL Global Development Group. (2024). PostgreSQL: The world's most advanced open source relational database. https://www.postgresql.org
+- phpMyAdmin. (2024). phpMyAdmin Documentation. Recuperado de: https://docs.phpmyadmin.net/ 
 
-- Docker Inc. (2024). Docker volumes. Recuperado de https://docs.docker.com/storage/volumes/
+- Nickoloff, J., & Kuenzli, S. (2019). Docker in Action. Simon and Schuster.
+
+- Miell, I., & Sayers, A. (2019). Docker in Practice. Simon and Schuster.
 
 
 
